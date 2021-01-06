@@ -19,7 +19,6 @@ router.get('/', async (req, res) => {
   } catch (err) {
     res.json({
       error: {
-        status: err.status,
         message: err.message,
       },
     });
@@ -33,7 +32,6 @@ router.get('/:id', async (req, res) => {
     if (todo.rowCount === 0) {
       res.status(404).json({
         error: {
-          status: 404,
           message: `There's no todo with id ${id}`,
         },
       });
@@ -41,9 +39,8 @@ router.get('/:id', async (req, res) => {
       res.json(todo.rows[0]);
     }
   } catch (err) {
-    res.status(err.status).json({
+    res.status(400).json({
       error: {
-        status: err.status,
         message: err.message,
       },
     });
@@ -68,12 +65,80 @@ router.post('/', async (req, res) => {
         },
       });
     } else {
-      res.json(newTodo);
+      res.json({
+        message: 'new todo inserted',
+      });
     }
   } catch (err) {
-    res.status(err.status).json({
+    res.status(400).json({
       error: {
-        status: err.status,
+        message: err.message,
+      },
+    });
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, status } = req.body;
+    const todo = await pool.query(
+      `
+      UPDATE todos
+      SET
+        title = $1,
+        description = $2,
+        status = $3
+      WHERE id = $4
+    `,
+      [title, description, status, id]
+    );
+    if (todo.rowCount === 0) {
+      res.status(400).json({
+        error: {
+          status: 400,
+          message: 'failed to update',
+        },
+      });
+    } else {
+      res.json({
+        message: 'todo updated',
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      error: {
+        message: err.message,
+      },
+    });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const todo = await pool.query(
+      `
+      DELETE FROM todos
+      WHERE id = $1
+    `,
+      [id]
+    );
+    if (todo.rowCount === 0) {
+      res.status(404).json({
+        error: {
+          status: 404,
+          message: `there's no todo with id ${id}`,
+        },
+      });
+    } else {
+      res.json({
+        message: 'todo deleted',
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      error: {
         message: err.message,
       },
     });
