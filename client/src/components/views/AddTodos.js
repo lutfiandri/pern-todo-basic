@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import Swal from 'sweetalert2';
 
 const AddTodo = () => {
   const [todo, setTodo] = useState({
@@ -6,6 +7,19 @@ const AddTodo = () => {
     body: '',
     status: '',
   });
+
+  // const addPost = async () => {
+  //   try {
+  //     const data = await axios.post('http://localhost:5000/api/todos', {
+  //       title: todo.title,
+  //       body: todo.body,
+  //       // status: todo.status === 1 ? 'checked' : 'active',
+  //     });
+  //     console.log(data);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   const handleChange = (e) => {
     setTodo({
@@ -16,10 +30,16 @@ const AddTodo = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // addPost();
     setTodo({
       title: '',
       body: '',
       status: '',
+    });
+    Swal.fire({
+      icon: 'success',
+      title: 'Great',
+      text: 'Your todo has been added :D',
     });
   };
 
