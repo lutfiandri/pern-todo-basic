@@ -1,31 +1,31 @@
-import { useState } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 
-const AddTodo = () => {
+const EditTodo = () => {
+  const history = useHistory();
+  const { id } = useParams();
   const [todo, setTodo] = useState({
+    id: '',
     title: '',
-    body: '',
+    description: '',
+    status: '',
   });
 
-  const addTodo = async () => {
+  const getTodo = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/todos`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: todo.title,
-          description: todo.body,
-          status: 'active',
-        }),
-      });
+      const response = await fetch(`http://localhost:5000/api/todos/${id}`);
       const data = await response.json();
       console.log(data);
+      setTodo(data);
     } catch (err) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    getTodo();
+  }, []);
 
   const handleChange = (e) => {
     setTodo({
@@ -34,23 +34,37 @@ const AddTodo = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    addTodo();
-    setTodo({
-      title: '',
-      body: '',
-    });
-    Swal.fire({
-      icon: 'success',
-      title: 'Great',
-      text: 'Your todo has been added :D',
-    });
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      const response = await fetch(`http://localhost:5000/api/todos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: todo.title,
+          description: todo.description,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+      Swal.fire({
+        icon: 'success',
+        title: 'Great',
+        text: 'Your todo has been updated :D',
+      }).then(() => {
+        history.push('/');
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <div className="container">
-      <h1 className="text-center text-xl font-medium py-5">Add Todo</h1>
+    <div>
+      <h1 className="text-center text-xl font-medium py-5">Edit Todo</h1>
+
       <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
         <label htmlFor="title" className="block pb-3">
           <div className="pb-1">Title</div>
@@ -62,21 +76,23 @@ const AddTodo = () => {
             className="w-full border-none bg-gray-200 focus:bg-transparent focus:ring focus:ring-gray-400 rounded transition duration-200 ease-in"
           />
         </label>
-        <label htmlFor="body" className="block pb-3">
+
+        <label htmlFor="description" className="block pb-3">
           <div className="pb-1">Todo</div>
           <textarea
             rows="5"
             type="text"
-            name="body"
-            value={todo.body}
+            name="description"
+            value={todo.description}
             onChange={handleChange}
             className="w-full border-none bg-gray-200 focus:bg-transparent focus:ring focus:ring-gray-400 rounded transition duration-200 ease-in"
           />
         </label>
+
         <label htmlFor="submit" className="block pb-3">
           <input
             type="submit"
-            value="add"
+            value="save"
             className="py-2 w-full border-none bg-gray-600 text-white font-medium cursor-pointer rounded focus:ring focus:ring-gray-400 transition duration-200 ease-in"
           />
         </label>
@@ -85,4 +101,4 @@ const AddTodo = () => {
   );
 };
 
-export default AddTodo;
+export default EditTodo;

@@ -1,18 +1,18 @@
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Home from './components/views/Home';
 import AddTodo from './components/views/AddTodos';
+import Navbar from './components/layouts/Navbar';
+import EditTodo from './components/views/EditTodo';
 
 const App = () => {
   return (
     <div className="App min-h-screen bg-gray-50">
       <Router>
+        <Navbar />
         <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route exact path="/add">
-            <AddTodo />
-          </Route>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/add" component={AddTodo} />
+          <Route exact path="/edit/:id" component={EditTodo} />
         </Switch>
       </Router>
     </div>

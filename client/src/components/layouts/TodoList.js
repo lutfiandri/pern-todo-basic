@@ -18,14 +18,15 @@ const TodoList = () => {
     getTodos();
   }, []);
 
-  const list = todos.map((t) => <TodoCard key={t.id} todo={t} />);
+  const deleteFromList = (id) => {
+    setTodos(todos.filter((t) => t.id !== id));
+  };
 
-  return (
-    <div>
-      <h1>todo list</h1>
-      {list}
-    </div>
-  );
+  const list = todos.map((t) => (
+    <TodoCard key={t.id} todo={t} deleteFromList={deleteFromList} />
+  ));
+
+  return <div>{list}</div>;
 };
 
 export default TodoList;
